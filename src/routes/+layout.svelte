@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { ModeWatcher } from 'mode-watcher';
+	import { ModeWatcher, setMode } from 'mode-watcher';
 	import '../app.pcss';
+
+	setMode('dark');
 </script>
 
 <ModeWatcher />
