@@ -3,10 +3,10 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ImportDialog from '$lib/importer/ImportDialog.svelte';
 
-	let importerOpen = false;
+	let importerOpen = true;
 </script>
 
-<ImportDialog open={importerOpen} onOpenChange={(value) => (importerOpen = value)} />
+<ImportDialog bind:open={importerOpen} />
 <div class="flex h-screen w-screen">
 	<div class="bg-primary0 min-w-80 p-2">
 		<div>

@@ -3,15 +3,17 @@
 	import * as Command from '$lib/components/ui/command';
 	import * as Popover from '$lib/components/ui/popover';
 	import { Button } from '$lib/components/ui/button';
-	import { cn } from '$lib/utils';
+	import { cn } from '$lib/utils/shadcn';
 	import { tick } from 'svelte';
+	import type { IManagedCollection } from '$lib/types/types';
 
-	export let collections: { id: string; label: string }[];
+	export let collections: IManagedCollection[];
+	export let value = '';
+
 	let open = false;
-	let value = '';
-	$: selectedValue = collections.find((f) => f.id === value)?.label ?? 'Select a collection...';
-
 	let searchValue = '';
+	let selectedValue = '';
+	$: selectedValue = collections.find((f) => f.id === value)?.label ?? 'Select a collection...';
 
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the

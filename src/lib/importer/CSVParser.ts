@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+import type { ParseResult, ParseStepResult } from 'papaparse';
 
 export interface ICSVParserConfig {
 	delimiter: string;
@@ -8,32 +9,31 @@ export interface ICSVParserConfig {
 	header: boolean;
 	dynamicTyping: boolean;
 	worker: boolean;
+	step?: (results: ParseStepResult<unknown>) => void;
 }
 
-const DEFAULT_PARSE_CONFIG: ICSVParserConfig = {
-	delimiter: '', // auto-detect
-	newLine: '', // auto-detect
-	quoteChar: '"',
-	escapeChar: '"',
-	header: true, // the first row of parsed data will be interpreted as field names
-	dynamicTyping: true, // numeric and boolean data will be converted to their type instead of remaining strings
-	worker: false
+const DEFAULT_PARSE_CONFIG: Partial<ICSVParserConfig> = {
+	// delimiter: '', // auto-detect
+	// newLine: '', // auto-detect
+	// quoteChar: '"',
+	// escapeChar: '"',
+	// header: true, // the first row of parsed data will be interpreted as field names
+	// dynamicTyping: true, // numeric and boolean data will be converted to their type instead of remaining strings
+	// worker: false
 };
 
 export class CSVParser {
-	public static parse(file: File, config: Partial<ICSVParserConfig> = {}) {
-		Papa.parse(file, {
-			...DEFAULT_PARSE_CONFIG,
-			...config,
-			step(results) {
-				console.log('STEP', results);
-			},
-			complete(results) {
-				console.log('COMPLETE', results);
-			},
-			error(error) {
-				console.error('ERROR', error);
-			}
+	public static parse(
+		file: File,
+		config: Partial<ICSVParserConfig> = {}
+	): Promise<ParseResult<string[]>> {
+		return new Promise((resolve, reject) => {
+			Papa.parse<string[]>(file, {
+				...DEFAULT_PARSE_CONFIG,
+				...config,
+				complete: resolve,
+				error: reject
+			});
 		});
 	}
 }

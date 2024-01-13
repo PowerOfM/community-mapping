@@ -3,7 +3,9 @@ export interface IRecord {
 }
 
 export enum RecordDataType {
-	Name
+	Label,
+	Address,
+	Other
 }
 
 export interface ITableColumn {
@@ -14,4 +16,13 @@ export interface ITableColumn {
 
 export interface ITable {
 	columns: ITableColumn[];
+}
+
+export interface ICollection {
+	id: string;
+	label: string;
+}
+
+export interface IManagedCollection extends ICollection {
+	isNew?: boolean;
 }

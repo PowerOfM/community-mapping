@@ -1,4 +1,5 @@
-import Root from "./input.svelte";
+import Root from './input.svelte';
+import { twClasses } from './styling';
 
 type FormInputEvent<T extends Event = Event> = T & {
 	currentTarget: EventTarget & HTMLInputElement;
@@ -21,5 +22,6 @@ export type InputEvents = {
 export {
 	Root,
 	//
-	Root as Input
+	Root as Input,
+	twClasses as inputStyles
 };
