@@ -23,5 +23,6 @@ export {
 	Root,
 	//
 	Root as Input,
+	//
 	twClasses as inputStyles
 };

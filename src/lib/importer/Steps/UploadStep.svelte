@@ -20,18 +20,22 @@
 			toast.error('Please select a file');
 			return;
 		}
-		if (!selectedCollectionId) {
+		const selectedCollection = collections.find((c) => c.id === selectedCollectionId);
+		if (!selectedCollection) {
 			toast.error('Please select or create a collection for this table');
 			return;
 		}
 
-		const data = await withToast(CSVParser.parse(inputFiles[0]), {
+		const result = await withToast(CSVParser.parse(inputFiles[0]), {
 			loading: 'Processing file...',
 			success: (result) => `${result.data.length} rows imported`
 		});
-		console.log('data', data);
-		// TODO: set store
+		console.log('result', result);
 
+		ImporterStore.inputData.set({
+			parsedRows: result.data,
+			collection: selectedCollection
+		});
 		ImporterStore.stepForward();
 	}
 </script>
@@ -45,13 +49,17 @@
 </Dialog.Header>
 
 <div class="mt-3 grid w-full gap-1.5">
-	<Label for="csv-input">CSV File</Label>
-	<input id="csv-input" class={inputStyles} type="file" bind:files={inputFiles} />
+	<Label for="importer-csv-fle">CSV File</Label>
+	<input id="importer-csv-fle" class={inputStyles} type="file" bind:files={inputFiles} />
 </div>
 
 <div class="mt-3 grid w-full gap-1.5">
-	<Label for="collection">Collection</Label>
-	<CollectionCombobox bind:collections bind:value={selectedCollectionId} />
+	<Label for="importer-collection-combobox">Collection</Label>
+	<CollectionCombobox
+		id="importer-collection-combobox"
+		bind:collections
+		bind:value={selectedCollectionId}
+	/>
 </div>
 
 <Dialog.Footer>

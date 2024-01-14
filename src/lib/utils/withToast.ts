@@ -12,7 +12,10 @@ const MSG_LOADING = 'Loading...';
 const MSG_SUCCESS = 'Process complete!';
 const MSG_ERROR = (err?: Error) => 'An unexpected error occurred: ' + err?.message;
 
-export const withToast = <T>(fn: Promise<T>, messages: Partial<IToastMessages<T>> = {}) => {
+export const withToast = <T>(
+	fn: Promise<T>,
+	messages: Partial<IToastMessages<T>> = {}
+): Promise<T> => {
 	return new Promise((resolve, reject) => {
 		toast.promise(fn, {
 			loading: messages.loading ?? MSG_LOADING,

@@ -9,6 +9,7 @@
 
 	export let collections: IManagedCollection[];
 	export let value = '';
+	export let id: string;
 
 	let open = false;
 	let searchValue = '';
@@ -44,6 +45,7 @@
 <Popover.Root bind:open let:ids>
 	<Popover.Trigger asChild let:builder>
 		<Button
+			{id}
 			builders={[builder]}
 			variant="outline"
 			role="combobox"

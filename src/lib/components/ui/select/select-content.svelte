@@ -2,6 +2,7 @@
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { cn, flyAndScale } from '$lib/utils/shadcn';
 	import { scale } from 'svelte/transition';
+	import { contentTWClasses } from './styling';
 
 	type $$Props = SelectPrimitive.ContentProps;
 
@@ -24,10 +25,7 @@
 	{outTransition}
 	{outTransitionConfig}
 	{sideOffset}
-	class={cn(
-		'relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md focus:outline-none',
-		className
-	)}
+	class={cn(contentTWClasses, className)}
 	{...$$restProps}
 >
 	<div class="w-full p-1">

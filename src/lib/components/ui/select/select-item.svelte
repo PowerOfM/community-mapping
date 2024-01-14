@@ -2,6 +2,7 @@
 	import { cn } from '$lib/utils/shadcn';
 	import { Select as SelectPrimitive } from 'bits-ui';
 	import { Check } from 'radix-icons-svelte';
+	import { itemTWClasses } from './styling';
 
 	type $$Props = SelectPrimitive.ItemProps;
 	type $$Events = Required<SelectPrimitive.ItemEvents>;
@@ -17,10 +18,7 @@
 	{value}
 	{disabled}
 	{label}
-	class={cn(
-		'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none data-[disabled]:pointer-events-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50',
-		className
-	)}
+	class={cn(itemTWClasses, className)}
 	{...$$restProps}
 	on:click
 	on:pointermove
