@@ -5,19 +5,20 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { ExclamationTriangle } from 'radix-icons-svelte';
-	import { ImporterStore, type IInputData } from '../ImporterStore';
+	import { ImporterStore } from '../ImporterStore';
 	import FieldDefinitionInput from '../FieldDefinitionInput.svelte';
+	import CollectionsCombobox from '../CollectionsCombobox.svelte';
+	import type { IManagedCollection } from '$lib/types/types';
+	import type { IFieldInputDefinition } from '../FieldDefinitionParser';
 
-	let inputData: IInputData | null;
-	ImporterStore.inputData.subscribe((data) => (inputData = data));
+	let collections: IManagedCollection[] = [];
+	let selectedCollectionId: string | undefined;
 
-	interface IFieldDefinition {
-		isComplex: boolean;
-		complexValue: string;
-		columnIndex?: number;
-	}
-	let addressField: IFieldDefinition = { isComplex: false, complexValue: '' };
-	let labelField: IFieldDefinition = { isComplex: false, complexValue: '' };
+	let tableData: string[][] = [];
+	ImporterStore.tableData.subscribe((data) => (tableData = data));
+
+	let addressField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
+	let labelField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
 
 	function handleNext() {}
 	function handleBack() {
@@ -26,16 +27,11 @@
 </script>
 
 <Dialog.Header>
-	<Dialog.Title>Define Columns</Dialog.Title>
-	<Dialog.Description>
-		To properly map the data, the system needs to know which column(s) correspond to a row's
-		"address" and its "label". These can be a single column, or a combination of columns, but must
-		be the same for all rows in the table.
-	</Dialog.Description>
+	<Dialog.Title>Organize Data</Dialog.Title>
 </Dialog.Header>
 
 <div class="mt-3 grid w-full gap-4">
-	{#if inputData == null || !inputData.parsedRows.length}
+	{#if !tableData.length}
 		<Alert.Root variant="destructive">
 			<ExclamationTriangle class="h-4 w-4" />
 			<Alert.Title>Error</Alert.Title>
@@ -43,12 +39,30 @@
 		</Alert.Root>
 	{:else}
 		<div>
+			<Label for="importer-collection-combobox">Collection</Label>
+			<CollectionsCombobox
+				id="importer-collection-combobox"
+				bind:collections
+				bind:value={selectedCollectionId}
+			/>
+			<p class="text-[0.8rem] text-muted-foreground">
+				Choose or create a collection to store this data
+			</p>
+		</div>
+
+		<p class="text-sm text-muted-foreground">
+			To properly map the data, the system needs to know which column(s) correspond to a row's
+			"address" and its "label". These can be a single column, or a combination of columns, but must
+			be the same for all rows in the table.
+		</p>
+
+		<div>
 			<Label>Address Field</Label>
 			<FieldDefinitionInput
 				bind:isComplex={addressField.isComplex}
 				bind:complexValue={addressField.complexValue}
 				bind:columnIndex={addressField.columnIndex}
-				options={inputData.parsedRows[0]}
+				options={tableData[0]}
 			/>
 		</div>
 		<div>
@@ -57,7 +71,7 @@
 				bind:isComplex={labelField.isComplex}
 				bind:complexValue={labelField.complexValue}
 				bind:columnIndex={labelField.columnIndex}
-				options={inputData.parsedRows[0]}
+				options={tableData[0]}
 			/>
 		</div>
 	{/if}

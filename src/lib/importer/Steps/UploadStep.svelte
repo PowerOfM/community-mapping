@@ -7,35 +7,25 @@
 	import { toast } from 'svelte-sonner';
 	import CollectionCombobox from '../CollectionsCombobox.svelte';
 	import { ImporterStore } from '../ImporterStore';
-	import { CSVParser } from '../CSVParser';
+	import { CSVParser, type CVSParseResult } from '../CSVParser';
 	import { withToast } from '$lib/utils';
+	import DataPreviewTable from '../DataPreviewTable.svelte';
 
-	export let collections: IManagedCollection[];
+	let tableData: string[][] | undefined;
+	ImporterStore.tableData.subscribe((value) => (tableData = value));
 
 	let inputFiles: FileList | undefined;
-	let selectedCollectionId: string | undefined;
+	$: if (inputFiles?.length) {
+		CSVParser.parse(inputFiles[0]).then((result) => {
+			ImporterStore.tableData.set(result.data);
+		});
+	}
 
 	async function handleNext() {
-		if (!inputFiles?.length) {
+		if (!tableData) {
 			toast.error('Please select a file');
 			return;
 		}
-		const selectedCollection = collections.find((c) => c.id === selectedCollectionId);
-		if (!selectedCollection) {
-			toast.error('Please select or create a collection for this table');
-			return;
-		}
-
-		const result = await withToast(CSVParser.parse(inputFiles[0]), {
-			loading: 'Processing file...',
-			success: (result) => `${result.data.length} rows imported`
-		});
-		console.log('result', result);
-
-		ImporterStore.inputData.set({
-			parsedRows: result.data,
-			collection: selectedCollection
-		});
 		ImporterStore.stepForward();
 	}
 </script>
@@ -53,15 +43,18 @@
 	<input id="importer-csv-fle" class={inputStyles} type="file" bind:files={inputFiles} />
 </div>
 
-<div class="mt-3 grid w-full gap-1.5">
-	<Label for="importer-collection-combobox">Collection</Label>
-	<CollectionCombobox
-		id="importer-collection-combobox"
-		bind:collections
-		bind:value={selectedCollectionId}
-	/>
-</div>
+{#if !!tableData}
+	<div class="mt-3 grid w-full gap-1.5">
+		<Label>Preview</Label>
+		<DataPreviewTable data={tableData} previewRows={5} />
+		<p class="text-sm text-secondary">+{tableData.length - 5} lines</p>
+	</div>
+{/if}
 
 <Dialog.Footer>
+	{#if !!tableData}
+		<Button type="button" variant="secondary" on:click={() => ImporterStore.reset()}>Clear</Button>
+	{/if}
+
 	<Button type="button" on:click={handleNext}>Next</Button>
 </Dialog.Footer>

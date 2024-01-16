@@ -12,6 +12,8 @@ export interface ICSVParserConfig {
 	step?: (results: ParseStepResult<unknown>) => void;
 }
 
+export type CVSParseResult = ParseResult<string[]>;
+
 const DEFAULT_PARSE_CONFIG: Partial<ICSVParserConfig> = {
 	// delimiter: '', // auto-detect
 	// newLine: '', // auto-detect

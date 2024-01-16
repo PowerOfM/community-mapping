@@ -50,7 +50,8 @@
 			variant="outline"
 			role="combobox"
 			aria-expanded={open}
-			class="w-auto justify-between"
+			class="justify-between"
+			style="width: calc(100% - 47px)"
 		>
 			{selectedValue}
 			<CaretSort class="ml-2 h-4 w-4 shrink-0 opacity-50" />

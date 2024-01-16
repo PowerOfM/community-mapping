@@ -2,27 +2,24 @@ import type { IManagedCollection } from '$lib/types/types';
 import { writable } from 'svelte/store';
 import { mockRows } from './mockData';
 
-export interface IInputData {
-	parsedRows: string[][];
-	collection: IManagedCollection;
+const MAX_STEP_INDEX = 3;
+
+class ImporterStoreClass {
+	public readonly stepIndex = writable(1);
+
+	public stepForward() {
+		this.stepIndex.update((n) => (n >= MAX_STEP_INDEX ? n : n + 1));
+	}
+	public stepBackward() {
+		this.stepIndex.update((n) => (n > 0 ? n - 1 : 0));
+	}
+
+	public readonly tableData = writable<string[][]>(mockRows);
+	public readonly collection = writable<IManagedCollection | undefined>();
+
+	public reset() {
+		this.stepIndex.set(1);
+	}
 }
 
-const MAX_STEP_INDEX = 1;
-const stepIndex = writable(1);
-const inputData = writable<IInputData | null>({
-	parsedRows: mockRows,
-	collection: { id: '1', label: 'Test', isNew: true }
-});
-
-export const ImporterStore = {
-	stepIndex,
-	stepForward: () => stepIndex.update((n) => (n >= MAX_STEP_INDEX ? n : n + 1)),
-	stepBackward: () => stepIndex.update((n) => (n > 0 ? n - 1 : 0)),
-
-	inputData,
-
-	reset: () => {
-		stepIndex.set(1);
-		// inputData.set(null);
-	}
-};
+export const ImporterStore = new ImporterStoreClass();
