@@ -10,6 +10,7 @@
 	export let isComplex: boolean;
 	export let complexValue: string = '';
 	export let columnIndex: number | undefined = undefined;
+	export let error: string | undefined = undefined;
 
 	$: console.log('selectedColumnIndex', columnIndex);
 
@@ -51,6 +52,6 @@
 	</Toggle>
 </div>
 
-<p class="text-[0.8rem] text-muted-foreground">
-	{hintLabel}
+<p class={cn('text-[0.8rem]', error ? 'text-destructive' : 'text-muted-foreground')}>
+	{error ?? hintLabel}
 </p>

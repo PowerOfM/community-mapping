@@ -3,13 +3,13 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
-	import { Input } from '$lib/components/ui/input';
 	import { ExclamationTriangle } from 'radix-icons-svelte';
 	import { ImporterStore } from '../ImporterStore';
 	import FieldDefinitionInput from '../FieldDefinitionInput.svelte';
 	import CollectionsCombobox from '../CollectionsCombobox.svelte';
 	import type { IManagedCollection } from '$lib/types/types';
 	import type { IFieldInputDefinition } from '../FieldDefinitionParser';
+	import { FieldDefinitionParser } from '../FieldDefinitionParser';
 
 	let collections: IManagedCollection[] = [];
 	let selectedCollectionId: string | undefined;
@@ -18,9 +18,24 @@
 	ImporterStore.tableData.subscribe((data) => (tableData = data));
 
 	let addressField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
+	let addressError: string | undefined;
 	let labelField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
+	let labelError: string | undefined;
 
-	function handleNext() {}
+	function handleNext() {
+		const addressParsed = FieldDefinitionParser.parse(addressField, tableData[0]);
+		if (!addressParsed) {
+			addressError = 'Invalid input. Please check the console for more information.';
+			return;
+		}
+		const labelParsed = FieldDefinitionParser.parse(labelField, tableData[0]);
+		if (!labelParsed) {
+			labelError = 'Invalid input. Please check the console for more information.';
+			return;
+		}
+
+		// TODO: set the store
+	}
 	function handleBack() {
 		ImporterStore.stepBackward();
 	}
@@ -63,6 +78,7 @@
 				bind:complexValue={addressField.complexValue}
 				bind:columnIndex={addressField.columnIndex}
 				options={tableData[0]}
+				error={addressError}
 			/>
 		</div>
 		<div>
@@ -72,6 +88,7 @@
 				bind:complexValue={labelField.complexValue}
 				bind:columnIndex={labelField.columnIndex}
 				options={tableData[0]}
+				error={labelError}
 			/>
 		</div>
 	{/if}
