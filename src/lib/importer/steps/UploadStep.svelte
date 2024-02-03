@@ -5,11 +5,11 @@
 	import { inputStyles } from '$lib/components/ui/input';
 	import type { IManagedCollection } from '$lib/types/types';
 	import { toast } from 'svelte-sonner';
-	import CollectionCombobox from '../CollectionsCombobox.svelte';
-	import { ImporterStore } from '../ImporterStore';
-	import { CSVParser, type CVSParseResult } from '../CSVParser';
+	import CollectionCombobox from '../components/CollectionsCombobox.svelte';
+	import { ImporterStore } from '../helpers/ImporterStore';
+	import { CSVParser, type CVSParseResult } from '../helpers/CSVParser';
 	import { withToast } from '$lib/utils';
-	import DataPreviewTable from '../DataPreviewTable.svelte';
+	import DataPreviewTable from '../components/DataPreviewTable.svelte';
 
 	let tableData: string[][] | undefined;
 	ImporterStore.tableData.subscribe((value) => (tableData = value));

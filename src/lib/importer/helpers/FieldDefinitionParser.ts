@@ -18,6 +18,15 @@ export class FieldDefinitionParser {
 		return this.parseComplex(input.complexValue, headers);
 	}
 
+	// TODO: this needs a test, it's not working
+	/**
+	  Input: {
+  		"isComplex": true,
+  		"complexValue": "{Address Line 1}, {City}, {Prov} {Postal}, Canada"
+		}
+
+		Output: [9, "}, ", 10, "}, ", 11, "} ", 12]
+	*/
 	private static parseComplex(value: string, headers: string[]): FieldDefinition | null {
 		const fieldDefinition: FieldDefinition = [];
 

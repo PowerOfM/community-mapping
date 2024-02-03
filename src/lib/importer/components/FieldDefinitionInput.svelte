@@ -12,8 +12,6 @@
 	export let columnIndex: number | undefined = undefined;
 	export let error: string | undefined = undefined;
 
-	$: console.log('selectedColumnIndex', columnIndex);
-
 	$: toggleLabel = isComplex
 		? 'Switch back to basic column select'
 		: 'Switch to combined column mode';

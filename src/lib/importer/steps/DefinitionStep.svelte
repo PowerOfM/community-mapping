@@ -4,25 +4,35 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
 	import { ExclamationTriangle } from 'radix-icons-svelte';
-	import { ImporterStore } from '../ImporterStore';
-	import FieldDefinitionInput from '../FieldDefinitionInput.svelte';
-	import CollectionsCombobox from '../CollectionsCombobox.svelte';
+	import { ImporterStore } from '../helpers/ImporterStore';
+	import FieldDefinitionInput from '../components/FieldDefinitionInput.svelte';
+	import CollectionsCombobox from '../components/CollectionsCombobox.svelte';
 	import type { IManagedCollection } from '$lib/types/types';
-	import type { IFieldInputDefinition } from '../FieldDefinitionParser';
-	import { FieldDefinitionParser } from '../FieldDefinitionParser';
+	import type { IFieldInputDefinition } from '../helpers/FieldDefinitionParser';
+	import { FieldDefinitionParser } from '../helpers/FieldDefinitionParser';
 
 	let collections: IManagedCollection[] = [];
 	let selectedCollectionId: string | undefined;
+	let selectedcollectionError: string | undefined;
 
 	let tableData: string[][] = [];
 	ImporterStore.tableData.subscribe((data) => (tableData = data));
 
 	let addressField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
 	let addressError: string | undefined;
+	ImporterStore.addressInputField.subscribe((value) => (addressField = value));
+
 	let labelField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
 	let labelError: string | undefined;
+	ImporterStore.labelInputField.subscribe((value) => (labelField = value));
 
 	function handleNext() {
+		// Validate
+		const selectedCollection = collections.find((c) => c.id === selectedCollectionId);
+		if (!selectedCollection) {
+			selectedcollectionError = 'Please select or create a collection for this table.';
+			return;
+		}
 		const addressParsed = FieldDefinitionParser.parse(addressField, tableData[0]);
 		if (!addressParsed) {
 			addressError = 'Invalid input. Please check the console for more information.';
@@ -34,7 +44,16 @@
 			return;
 		}
 
-		// TODO: set the store
+		// Update store
+		ImporterStore.collection.set(selectedCollection);
+		ImporterStore.addressField.set(addressParsed);
+		ImporterStore.labelField.set(labelParsed);
+
+		// Start processing
+		// TODO:
+
+		// Advance UI
+		ImporterStore.stepForward();
 	}
 	function handleBack() {
 		ImporterStore.stepBackward();
