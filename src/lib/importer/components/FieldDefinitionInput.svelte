@@ -5,6 +5,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { cn } from '$lib/utils';
 	import CodeAutocomplete from './CodeAutocomplete.svelte';
+	import type { IFieldInputDefinition } from '../helpers/FieldDefinitionParser';
 
 	export let options: string[];
 	export let isComplex: boolean;

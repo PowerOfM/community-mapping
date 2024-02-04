@@ -4,59 +4,55 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
 	import { ExclamationTriangle } from 'radix-icons-svelte';
-	import { ImporterStore } from '../helpers/ImporterStore';
+	import { ImportStoreControl, addressInputFieldStore, definitionStore, labelInputFieldStore, tableDataStore } from '../ImporterStores';
 	import FieldDefinitionInput from '../components/FieldDefinitionInput.svelte';
 	import CollectionsCombobox from '../components/CollectionsCombobox.svelte';
-	import type { IManagedCollection } from '$lib/types/types';
-	import type { IFieldInputDefinition } from '../helpers/FieldDefinitionParser';
+	import type { IManagedCollection } from '$lib/DataTypes';
 	import { FieldDefinitionParser } from '../helpers/FieldDefinitionParser';
+	import { cn } from '$lib/utils';
+	import { DataStore } from '$lib/DataStore';
+	import { get } from 'svelte/store';
 
-	let collections: IManagedCollection[] = [];
-	let selectedCollectionId: string | undefined;
-	let selectedcollectionError: string | undefined;
+	// Don't subscribe as we want to manipulate the array
+	let collections: IManagedCollection[] = get(DataStore.collections);
 
-	let tableData: string[][] = [];
-	ImporterStore.tableData.subscribe((data) => (tableData = data));
+	let selectedCollectionId = $definitionStore.collection?.id
+	let selectedCollectionError: string | undefined;
 
-	let addressField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
+	let tableData: string[][] = $tableDataStore
+
 	let addressError: string | undefined;
-	ImporterStore.addressInputField.subscribe((value) => (addressField = value));
-
-	let labelField: IFieldInputDefinition = { isComplex: false, complexValue: '' };
 	let labelError: string | undefined;
-	ImporterStore.labelInputField.subscribe((value) => (labelField = value));
 
 	function handleNext() {
 		// Validate
 		const selectedCollection = collections.find((c) => c.id === selectedCollectionId);
 		if (!selectedCollection) {
-			selectedcollectionError = 'Please select or create a collection for this table.';
-			return;
+			selectedCollectionError = 'Please select or create a collection for this table.';
 		}
-		const addressParsed = FieldDefinitionParser.parse(addressField, tableData[0]);
-		if (!addressParsed) {
+		const addressField = FieldDefinitionParser.parse(get(addressInputFieldStore), tableData[0]);
+		if (!addressField) {
 			addressError = 'Invalid input. Please check the console for more information.';
-			return;
 		}
-		const labelParsed = FieldDefinitionParser.parse(labelField, tableData[0]);
-		if (!labelParsed) {
+		const labelField = FieldDefinitionParser.parse(get(labelInputFieldStore), tableData[0]);
+		if (!labelField) {
 			labelError = 'Invalid input. Please check the console for more information.';
-			return;
 		}
+		if (!selectedCollection || !addressField || !labelField) return;
 
 		// Update store
-		ImporterStore.collection.set(selectedCollection);
-		ImporterStore.addressField.set(addressParsed);
-		ImporterStore.labelField.set(labelParsed);
+		definitionStore.set({
+			collection: selectedCollection,
+			addressField,
+			labelField
+		})
 
 		// Start processing
-		// TODO:
-
-		// Advance UI
-		ImporterStore.stepForward();
+		ImportStoreControl.runProcessor()
+		ImportStoreControl.stepForward()
 	}
 	function handleBack() {
-		ImporterStore.stepBackward();
+		ImportStoreControl.stepBackward()
 	}
 </script>
 
@@ -79,8 +75,13 @@
 				bind:collections
 				bind:value={selectedCollectionId}
 			/>
-			<p class="text-[0.8rem] text-muted-foreground">
-				Choose or create a collection to store this data
+			<p
+				class={cn(
+					'text-[0.8rem]',
+					selectedCollectionError ? 'text-destructive' : 'text-muted-foreground'
+				)}
+			>
+				{selectedCollectionError ?? 'Choose or create a collection to store this data'}
 			</p>
 		</div>
 
@@ -93,9 +94,9 @@
 		<div>
 			<Label>Address Field</Label>
 			<FieldDefinitionInput
-				bind:isComplex={addressField.isComplex}
-				bind:complexValue={addressField.complexValue}
-				bind:columnIndex={addressField.columnIndex}
+				bind:isComplex={$addressInputFieldStore.isComplex}
+				bind:complexValue={$addressInputFieldStore.complexValue}
+				bind:columnIndex={$addressInputFieldStore.columnIndex}
 				options={tableData[0]}
 				error={addressError}
 			/>
@@ -103,9 +104,9 @@
 		<div>
 			<Label>Label Field</Label>
 			<FieldDefinitionInput
-				bind:isComplex={labelField.isComplex}
-				bind:complexValue={labelField.complexValue}
-				bind:columnIndex={labelField.columnIndex}
+				bind:isComplex={$labelInputFieldStore.isComplex}
+				bind:complexValue={$labelInputFieldStore.complexValue}
+				bind:columnIndex={$labelInputFieldStore.columnIndex}
 				options={tableData[0]}
 				error={labelError}
 			/>

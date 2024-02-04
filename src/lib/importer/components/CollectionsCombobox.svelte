@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils/shadcn';
 	import { tick } from 'svelte';
-	import type { IManagedCollection } from '$lib/types/types';
+	import type { IManagedCollection } from '$lib/DataTypes';
 
 	export let collections: IManagedCollection[];
 	export let value = '';
@@ -35,7 +35,7 @@
 		if (!searchValue.length) return;
 
 		const newId = 'id-' + collections.length;
-		collections = [...collections, { id: newId, label: searchValue, isNew: true }];
+		collections = [...collections, { id: newId, label: searchValue, tables: [], isNew: true }];
 		value = newId;
 		searchValue = '';
 		closeAndFocusTrigger(triggerId);

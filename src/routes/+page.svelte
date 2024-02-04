@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Map from '$lib/map/Map.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import ImportDialog from '$lib/importer/ImportDialog.svelte';
+	import ImporterDialog from '$lib/importer/ImporterDialog.svelte';
 
 	let importerOpen = true;
 </script>
 
-<ImportDialog bind:open={importerOpen} />
+<ImporterDialog bind:open={importerOpen} />
 <div class="flex h-screen w-screen">
 	<div class="bg-primary0 min-w-80 p-2">
 		<div>

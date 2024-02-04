@@ -3,21 +3,17 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
 	import { inputStyles } from '$lib/components/ui/input';
-	import type { IManagedCollection } from '$lib/types/types';
 	import { toast } from 'svelte-sonner';
-	import CollectionCombobox from '../components/CollectionsCombobox.svelte';
-	import { ImporterStore } from '../helpers/ImporterStore';
-	import { CSVParser, type CVSParseResult } from '../helpers/CSVParser';
-	import { withToast } from '$lib/utils';
+	import { ImportStoreControl, tableDataStore } from '../ImporterStores';
+	import { CSVParser } from '../helpers/CSVParser';
 	import DataPreviewTable from '../components/DataPreviewTable.svelte';
 
-	let tableData: string[][] | undefined;
-	ImporterStore.tableData.subscribe((value) => (tableData = value));
+	let tableData = $tableDataStore;
 
 	let inputFiles: FileList | undefined;
 	$: if (inputFiles?.length) {
 		CSVParser.parse(inputFiles[0]).then((result) => {
-			ImporterStore.tableData.set(result.data);
+			$tableDataStore = result.data;
 		});
 	}
 
@@ -26,7 +22,7 @@
 			toast.error('Please select a file');
 			return;
 		}
-		ImporterStore.stepForward();
+		ImportStoreControl.stepForward();
 	}
 </script>
 
@@ -53,7 +49,9 @@
 
 <Dialog.Footer>
 	{#if !!tableData}
-		<Button type="button" variant="secondary" on:click={() => ImporterStore.reset()}>Clear</Button>
+		<Button type="button" variant="secondary" on:click={() => ImportStoreControl.reset()}
+			>Clear</Button
+		>
 	{/if}
 
 	<Button type="button" on:click={handleNext}>Next</Button>

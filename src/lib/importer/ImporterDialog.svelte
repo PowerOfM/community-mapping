@@ -1,19 +1,24 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { ImporterStore } from './helpers/ImporterStore';
+	import { get } from 'svelte/store';
+	import { dialogStateStore, ImportStoreControl } from './ImporterStores';
 	import DefinitionStep from './steps/DefinitionStep.svelte';
 	import ProcessStep from './steps/ProcessStep.svelte';
 	import UploadStep from './steps/UploadStep.svelte';
 
 	export let open = false;
-	$: if (open) ImporterStore.reset();
+	$: if (open) ImportStoreControl.reset();
 
-	let step = 0;
-	ImporterStore.stepIndex.subscribe((value) => (step = value));
+	let step = $dialogStateStore.step;
 </script>
 
-<Dialog.Root {open} onOpenChange={(value) => (open = value)}>
-	<Dialog.Content class="sm:max-w-[600px]">
+<Dialog.Root
+	{open}
+	onOpenChange={(value) => (open = value)}
+	closeOnEscape={false}
+	closeOnOutsideClick={false}
+>
+	<Dialog.Content class="sm:max-w-[600px]" closeable={$dialogStateStore.closeable}>
 		{#if step === 0}
 			<UploadStep />
 		{:else if step === 1}

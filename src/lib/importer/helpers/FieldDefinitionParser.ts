@@ -1,10 +1,10 @@
-export interface IFieldInputDefinition {
+import type { FieldDefinition } from '$lib/DataTypes';
+
+export type IFieldInputDefinition = {
 	isComplex: boolean;
 	complexValue: string;
 	columnIndex?: number;
-}
-
-export type FieldDefinition = (string | number)[];
+};
 
 export class FieldDefinitionParser {
 	public static parse(input: IFieldInputDefinition, headers: string[]): FieldDefinition | null {
@@ -18,24 +18,15 @@ export class FieldDefinitionParser {
 		return this.parseComplex(input.complexValue, headers);
 	}
 
-	// TODO: this needs a test, it's not working
-	/**
-	  Input: {
-  		"isComplex": true,
-  		"complexValue": "{Address Line 1}, {City}, {Prov} {Postal}, Canada"
-		}
-
-		Output: [9, "}, ", 10, "}, ", 11, "} ", 12]
-	*/
 	private static parseComplex(value: string, headers: string[]): FieldDefinition | null {
 		const fieldDefinition: FieldDefinition = [];
 
 		// Convert {Header} to indices
-		let cursor = 0;
+		let cursor = -1;
 		let i = -1;
 		while ((i = value.indexOf('{', cursor)) >= 0) {
-			if (i - cursor > 0) {
-				fieldDefinition.push(value.slice(cursor, i));
+			if (i - cursor > 1) {
+				fieldDefinition.push(value.slice(cursor + 1, i));
 			}
 			cursor = value.indexOf('}', i);
 			if (cursor < i) {
@@ -50,6 +41,9 @@ export class FieldDefinitionParser {
 				return null;
 			}
 			fieldDefinition.push(headerIndex);
+		}
+		if (cursor < value.length - 1) {
+			fieldDefinition.push(value.slice(cursor + 1));
 		}
 
 		// Array of [str, index, ...]
