@@ -4,22 +4,28 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Label } from '$lib/components/ui/label';
 	import { ExclamationTriangle } from 'radix-icons-svelte';
-	import { ImportStoreControl, addressInputFieldStore, definitionStore, labelInputFieldStore, tableDataStore } from '../ImporterStores';
+	import {
+		ImportStoreControl,
+		addressInputFieldStore,
+		definitionStore,
+		labelInputFieldStore,
+		tableDataStore
+	} from '../ImporterStores';
 	import FieldDefinitionInput from '../components/FieldDefinitionInput.svelte';
 	import CollectionsCombobox from '../components/CollectionsCombobox.svelte';
 	import type { IManagedCollection } from '$lib/DataTypes';
 	import { FieldDefinitionParser } from '../helpers/FieldDefinitionParser';
 	import { cn } from '$lib/utils';
-	import { DataStore } from '$lib/DataStore';
+	import { collectionsStore } from '$lib/DataStore';
 	import { get } from 'svelte/store';
 
 	// Don't subscribe as we want to manipulate the array
-	let collections: IManagedCollection[] = get(DataStore.collections);
+	let collections: IManagedCollection[] = get(collectionsStore);
 
-	let selectedCollectionId = $definitionStore.collection?.id
+	let selectedCollectionId = $definitionStore.collection?.id;
 	let selectedCollectionError: string | undefined;
 
-	let tableData: string[][] = $tableDataStore
+	let tableData: string[][] = $tableDataStore;
 
 	let addressError: string | undefined;
 	let labelError: string | undefined;
@@ -45,14 +51,14 @@
 			collection: selectedCollection,
 			addressField,
 			labelField
-		})
+		});
 
 		// Start processing
-		ImportStoreControl.runProcessor()
-		ImportStoreControl.stepForward()
+		ImportStoreControl.runProcessor();
+		ImportStoreControl.stepForward();
 	}
 	function handleBack() {
-		ImportStoreControl.stepBackward()
+		ImportStoreControl.stepBackward();
 	}
 </script>
 
