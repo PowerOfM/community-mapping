@@ -1,4 +1,5 @@
 import { PUBLIC_GOOGLE_MAPS_API_KEY } from '$env/static/public';
+import type { Coordinates, IGeoAddressPart } from '$lib/DataTypes';
 import { RateLimiter } from 'limiter';
 
 // https://developers.google.com/maps/documentation/geocoding/requests-geocoding#StatusCodes
@@ -19,8 +20,8 @@ type GoogleMapsGeocodeResponse = google.maps.GeocoderResponse & {
 export interface IGeoAddress {
 	key: string;
 	address: string;
-	coords: google.maps.LatLngLiteral;
-	raw?: google.maps.GeocoderResult;
+	coords: Coordinates;
+	parts: IGeoAddressPart[];
 }
 
 type GeocodeCacheResult = { ok: true; value: IGeoAddress[] } | { ok: false; error: Error };
@@ -75,12 +76,24 @@ class GeocoderClass {
 			return jsonResponse.results.map((result) => ({
 				key: input,
 				address: result.formatted_address,
-				coords: result.geometry.location.toJSON(),
-				raw: result
+				coords: this.buildCoords(result.geometry.location),
+				parts: result.address_components.map((component) => ({
+					longName: component.long_name,
+					shortName: component.short_name,
+					types: component.types
+				}))
 			}));
 		}
 
 		throw new Error('Geocoder error: ' + json.status, { cause: json });
+	}
+
+	private buildCoords(input: google.maps.LatLng): Coordinates {
+		// Typings in the google-maps type-library doesn't match actual response
+		return {
+			lat: input.lat as unknown as number,
+			lng: input.lng as unknown as number
+		};
 	}
 }
 

@@ -1,15 +1,19 @@
 import type { FieldDefinition, ILocation, IRecord, ITable, ITableError } from '$lib/DataTypes';
 import { Geocoder } from '$lib/utils/Geocoder';
+import { LoggerBuilder } from '$lib/utils/Logger';
 
 const FALLBACK_LOCATION: ILocation = {
 	id: 'error',
 	input: '',
 	address: 'Unknown Address',
-	coords: { lat: 49.2314375, lng: -123.1037624 }
+	coords: { lat: 49.2314375, lng: -123.1037624 },
+	parts: []
 };
 const STEP_UPDATE_DELAY = 500; // ms
 
 export class TableBuilder {
+	private log = LoggerBuilder.build('TableBuilder');
+
 	private readonly locationsByAddress: Record<string, ILocation> = {};
 	private readonly errors: ITableError[] = [];
 	private onStepCallback: (val: number) => void = () => {};
@@ -40,6 +44,7 @@ export class TableBuilder {
 
 		return {
 			id: crypto.randomUUID(),
+			label: 'Table',
 			records,
 			locations: this.getLocationsById(),
 
@@ -94,7 +99,8 @@ export class TableBuilder {
 				id: crypto.randomUUID(),
 				input,
 				address,
-				coords: results[0].coords
+				coords: results[0].coords,
+				parts: results[0].parts
 			};
 			if (results.length > 1) {
 				location.options = results;
@@ -102,6 +108,7 @@ export class TableBuilder {
 			this.locationsByAddress[address] = location;
 			return location.id;
 		} catch (error) {
+			this.log.error('Unable to process address', rawAddress, error);
 			this.errors.push({ index, error: error as Error, input });
 			return this.buildFallbackLocationId();
 		}

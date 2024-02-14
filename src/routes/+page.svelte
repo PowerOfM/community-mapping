@@ -2,8 +2,10 @@
 	import Map from '$lib/map/Map.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ImporterDialog from '$lib/importer/ImporterDialog.svelte';
+	import { collectionsStore } from '$lib/DataStore';
 
-	let importerOpen = true;
+	let importerOpen = false;
+	let collections = $collectionsStore;
 </script>
 
 <ImporterDialog bind:open={importerOpen} />
@@ -17,10 +19,14 @@
 		<hr class="mb-2 mt-3" />
 		Collections:
 		<br />
-		Main
-		<ul class="list-disc pl-5">
-			<li>Table 1</li>
-		</ul>
+		{#each collections as collection}
+			{collection.label}
+			{#each collection.tables as table}
+				<ul class="list-disc pl-5">
+					<li>{table.label}</li>
+				</ul>
+			{/each}
+		{/each}
 	</div>
 	<div class="flex flex-1">
 		<Map />
