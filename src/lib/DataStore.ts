@@ -24,7 +24,7 @@ function addTable(collectionId: string, value: ITable) {
 				...prev,
 				{
 					id: crypto.randomUUID(),
-					label: 'OrphanedOrphaned Table',
+					label: 'Other Tables',
 					tables: [value]
 				}
 			];
@@ -37,11 +37,19 @@ function addTable(collectionId: string, value: ITable) {
 		}
 
 		next[targetIndex] = { ...target, tables: [...target.tables, value] };
-		log('Add table result', next);
+		log('Added table', next);
 		return next;
 	});
 }
 
+function addCollection(value: ICollection) {
+	collectionsStore.update((prev) => {
+		log('Added collection', value);
+		return [...prev, value];
+	});
+}
+
 export const DataStore = {
+	addCollection,
 	addTable
 };

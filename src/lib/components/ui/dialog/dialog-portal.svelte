@@ -7,9 +7,3 @@
 <DialogPrimitive.Portal {...$$restProps} class="z-2000">
 	<slot />
 </DialogPrimitive.Portal>
-
-<style>
-	.z-2000 {
-		z-index: 2000;
-	}
-</style>
